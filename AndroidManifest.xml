@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="net.neonlotus.ucritic"
+          android:versionCode="1"
+          android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="9"/>
+    <application android:label="uCritic">
+        <activity
+                  android:label="uCritic" android:name=".MyActivity">
+            <intent-filter>
+                <!--<action android:id="android.intent.action.MAIN"/>-->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+
+</manifest> 
