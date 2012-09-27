@@ -2,11 +2,9 @@ package net.neonlotus.ucritic;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class MovieObject {
 
-	public List<Rating> ratings; //You are a problem
+	public Rating ratings; //You are a problem
 
 	@SerializedName("id")
 	public String id;

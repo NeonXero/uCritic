@@ -10,5 +10,15 @@
             android:text="Hello World, MyActivity"
             android:id="@+id/text1"
             />
+    <EditText
+        android:id="@+id/editOne"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="Search movie"
+        />
+    <Button
+        android:id="@+id/button"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="Click Me" />
 </LinearLayout>
-
