@@ -30,29 +30,27 @@ public class MyActivity extends Activity implements View.OnClickListener {
 	static String movieID = "770672122";
 	private static String url = ("http://api.rottentomatoes.com/api/public/v1.0/movies/"+movieID+".json?apikey="+myAPI);
 
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
 		InputStream source = retrieveStream(url);
 
 		Gson gson = new Gson();
 
 		Reader reader = new InputStreamReader(source);
 
-		MovieObject mObject = gson.fromJson(reader, MovieObject.class);
+		MovieObject mObject = gson.fromJson(reader, MovieObject.class); //Expected BEGIN_ARRAY but was BEGIN_OBJECT instead. Something to do with the Rating object I believe.
+		List<Rating> ratings = mObject.ratings;
 
 		Toast.makeText(this, mObject.title, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, mObject.synopsis,Toast.LENGTH_SHORT).show();
 
-		List<Rating> ratings = mObject.ratings;
 
 		for (Rating rating : ratings) {
 			Toast.makeText(this, rating.criticsScore,Toast.LENGTH_SHORT).show();
 		}
-
-
-
 
 	}
 
@@ -75,7 +73,6 @@ public class MyActivity extends Activity implements View.OnClickListener {
 
 			HttpEntity getResponseEntity = getResponse.getEntity();
 			return getResponseEntity.getContent();
-
 		}
 		catch (IOException e) {
 			getRequest.abort();
@@ -83,7 +80,6 @@ public class MyActivity extends Activity implements View.OnClickListener {
 		}
 
 		return null;
-
 	}
 
 	public void onClick(View view) {

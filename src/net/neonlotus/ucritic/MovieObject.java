@@ -6,8 +6,7 @@ import java.util.List;
 
 public class MovieObject {
 
-	public List<Rating> ratings;
-
+	public List<Rating> ratings; //You are a problem
 
 	@SerializedName("id")
 	public String id;
@@ -32,5 +31,4 @@ public class MovieObject {
 
 	@SerializedName("studio")
 	public String studio;
-
 }
