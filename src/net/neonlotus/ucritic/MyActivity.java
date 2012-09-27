@@ -31,41 +31,25 @@ public class MyActivity extends Activity implements View.OnClickListener {
 	private static String url = ("http://api.rottentomatoes.com/api/public/v1.0/movies/"+movieID+".json?apikey="+myAPI);
 
 
-	private String jstring;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		t1 = (TextView) findViewById(R.id.text1);
-
 		InputStream source = retrieveStream(url);
 
 		Gson gson = new Gson();
-		// SO
-		//JsonParser parser = new JsonParser();
-		//JsonArray Jarray = parser.parse(jstring).getAsJsonArray();
-
-		//ArrayList<Rating> lcs = new ArrayList<Rating>();
-
-		//for(JsonElement obj : Jarray )
-		//{
-		//	Rating cse = gson.fromJson( obj , Rating.class);
-		//	lcs.add(cse);
-		//}
-		//Toast.makeText(MyActivity.this,lcs.get(0).toString(),Toast.LENGTH_SHORT).show();
-
-		// SO
 
 		Reader reader = new InputStreamReader(source);
 
-		MovieObject mObject = gson.fromJson(reader, MovieObject.class); //wat
+		MovieObject mObject = gson.fromJson(reader, MovieObject.class);
 
-		Toast.makeText(this, mObject.title,Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, mObject.title, Toast.LENGTH_SHORT).show();
 
 		List<Rating> ratings = mObject.ratings;
 
-		//t1.setText(results.get(0).toString());
+		for (Rating rating : ratings) {
+			Toast.makeText(this, rating.criticsScore,Toast.LENGTH_SHORT).show();
+		}
 
 
 
