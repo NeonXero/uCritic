@@ -37,7 +37,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	private EditText e1;
 	private Button b1, b2;
 
-	private ArrayList<String> mainList = new ArrayList<String>();
+	private ArrayList<String> idList = new ArrayList<String>();
 	private ArrayList<String> titleList = new ArrayList<String>();
 
 	public String movieID;
@@ -50,35 +50,34 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 
 		final ListView lv = (ListView)findViewById(android.R.id.list);
-		//lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mainList));
+		//lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, idList));
 		lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, titleList));
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-				String movieTitleFromSearch = lv.getItemAtPosition(position).toString();
-				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromSearch);
+
+				String movieTitleFromEditText = lv.getItemAtPosition(position).toString().replace(" ","+");
+				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
+
+				//String value = lv.getItemAtPosition(position).toString();
+
+				//setMovieID(value); //hmm
 
 				InputStream source = retrieveStream(movieQueryUrl);
-				Gson gson = new Gson();
-				Reader reader = new InputStreamReader(source);
-				MovieObject mObj = gson.fromJson(reader, MovieObject.class);
-
-				//List<Movie> mMovie = mQuery.movies;
-				Toast.makeText(getBaseContext(),mObj.ratings.criticsScore,Toast.LENGTH_SHORT).show();
-
-				/*String value = lv.getItemAtPosition(position).toString();
-
-				setMovieID(value); //hmm
-
-				InputStream source = retrieveStream(generateMovieUrl(movieID));
 
 				Gson gson = new Gson();
-
 				Reader reader = new InputStreamReader(source);
+				Query mQuery = gson.fromJson(reader, Query.class);
 
-				MovieObject mObject = gson.fromJson(reader, MovieObject.class);
-				Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();*/
+				List<Movie> mMovie = mQuery.movies;
+				MovieObject mObj = getMovieDataWithId(idList.get(position));
+				String cs = String.valueOf(mObj.ratings.criticsScore);
+				Toast.makeText(getApplicationContext(), cs, Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), String.valueOf(mMovie.size()), Toast.LENGTH_SHORT).show();
+
+				//MovieObject mObject = gson.fromJson(reader, MovieObject.class);
+				//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -104,14 +103,14 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		t1 = (TextView) findViewById(R.id.text1);
 		e1 = (EditText) findViewById(R.id.editOne);
 		b1 = (Button) findViewById(R.id.button);
-		b2 = (Button) findViewById(R.id.button2);
+		//b2 = (Button) findViewById(R.id.button2);
 
 		b1.setOnClickListener(this);
-		b2.setOnClickListener(this);
+		//b2.setOnClickListener(this);
 
 	}
 
-    private MovieObject getMovieDataWithId(String movieID) {
+    private MovieObject getMovieDataWithId(String movieID) { //return movie object given an ID
 		InputStream source = retrieveStream(generateMovieUrl(movieID));
         Gson gson = new Gson();
         Reader reader = new InputStreamReader(source);
@@ -143,15 +142,15 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 				List<Movie> mMovie = mQuery.movies;
 
-				for (int i = 0; i < mainList.size();i++) { //Reset list before populating with new results
-					mainList.remove(i);
+				for (int i = 0; i < idList.size();i++) { //Reset list before populating with new results
+					idList.remove(i);
 				}
 				for (Movie movie : mMovie) {
-					mainList.add(movie.id);
+					idList.add(movie.id);
 				}
-				for (int i = 0;i<mainList.size();i++) {
+				for (int i = 0;i< idList.size();i++) {
 					//testing
-					String temp_ID = mainList.get(i);
+					String temp_ID = idList.get(i);
 					InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
 
 					Gson gson2 = new Gson();
@@ -165,10 +164,10 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 				break;
 
-			case R.id.button2:
-				t1.setText("Button 2 test");
-				getMovieDataWithId(t1.getText().toString());
-				break;
+//			case R.id.button2:
+//				t1.setText("Button 2 test");
+//				getMovieDataWithId(t1.getText().toString());
+//				break;
 		}
 	}
 
