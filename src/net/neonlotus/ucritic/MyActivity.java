@@ -45,10 +45,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		//mainList.add("Dog");
-
 		final ListView lv = (ListView)findViewById(android.R.id.list);
-		//String[] listword = new String[] {"Hello","World","Foo","Bar"};
 		lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mainList));
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -66,7 +63,6 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				Reader reader = new InputStreamReader(source);
 
 				MovieObject mObject = gson.fromJson(reader, MovieObject.class);
-				//Toast.makeText(getBaseContext(), "Click", Toast.LENGTH_LONG).show();
 				Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -87,9 +83,6 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 				MovieObject mObject = getMovieDataWithId(movieID); //gson.fromJson(reader, MovieObject.class);
 				String cs = String.valueOf(mObject.ratings.criticsScore);
-				//Toast.makeText(getBaseContext(), "Click", Toast.LENGTH_LONG).show();
-				//getMovieDataWithId(movieID);
-				//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
 				Toast.makeText(getApplicationContext(), cs, Toast.LENGTH_SHORT).show();
 				return false;
 			}
@@ -104,46 +97,14 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		b1.setOnClickListener(this);
 		b2.setOnClickListener(this);
 
-		/*b1.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-                String movieTitleFromEditText = e1.getText().toString().replace(" ","+");
-                String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
-
-				//Toast.makeText(MyActivity.this, movieTitle,Toast.LENGTH_SHORT).show();
-                Log.d("ucritic", "request url: " + movieQueryUrl);
-				InputStream source = retrieveStream(movieQueryUrl);
-				Gson gson = new Gson();
-				Reader reader = new InputStreamReader(source);
-				Query mQuery = gson.fromJson(reader, Query.class);
-
-                List<Movie> mMovie = mQuery.movies;
-				//messing around
-				t1.setText(mMovie.get(0).id);
-
-				for (Movie movie : mMovie) {
-					Toast.makeText(MyActivity.this, movie.id, Toast.LENGTH_SHORT).show();
-				}
-			}
-		});*/
 	}
 
     private MovieObject getMovieDataWithId(String movieID) {
-        //String mID = movieID;
 		InputStream source = retrieveStream(generateMovieUrl(movieID));
-
         Gson gson = new Gson();
-
         Reader reader = new InputStreamReader(source);
-
         MovieObject mObject = gson.fromJson(reader, MovieObject.class);
-        Rating ratings = mObject.ratings;
 
-        //Toast.makeText(this, mObject.title, Toast.LENGTH_SHORT).show();
-        //Toast.makeText(this, mObject.synopsis,Toast.LENGTH_SHORT).show();
-		//Toast.makeText(this, ratings.criticsScore, Toast.LENGTH_SHORT).show();
-
-        //Toast.makeText(this, String.valueOf(ratings.criticsScore),Toast.LENGTH_SHORT).show();
 		return mObject;
     }
 
@@ -162,7 +123,6 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				String movieTitleFromEditText = e1.getText().toString().replace(" ","+");
 				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
-				//Toast.makeText(MyActivity.this, movieTitle,Toast.LENGTH_SHORT).show();
 				Log.d("ucritic", "request url: " + movieQueryUrl);
 				InputStream source = retrieveStream(movieQueryUrl);
 				Gson gson = new Gson();
@@ -171,10 +131,10 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 				List<Movie> mMovie = mQuery.movies;
 
-				//t1.setText(mMovie.get(0).id);
-
+				for (int i = 0; i < mainList.size();i++) { //Reset list before populating with new results
+					mainList.remove(i);
+				}
 				for (Movie movie : mMovie) {
-					//Toast.makeText(MyActivity.this, movie.id, Toast.LENGTH_SHORT).show();
 					mainList.add(movie.id);
 				}
 
@@ -184,7 +144,6 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				t1.setText("Button 2 test");
 				getMovieDataWithId(t1.getText().toString());
 				break;
-
 		}
 	}
 
@@ -286,6 +245,4 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
         return (uri != null) ? uri.toString() : null;
     }
-
-
 }
