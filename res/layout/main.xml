@@ -20,6 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:hint="Search movie..."
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
             />
         <Button
             android:id="@+id/button"

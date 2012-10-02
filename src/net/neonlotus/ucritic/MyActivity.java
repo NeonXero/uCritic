@@ -3,7 +3,9 @@ package net.neonlotus.ucritic;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
@@ -37,6 +39,9 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	private EditText e1;
 	private Button b1, b2;
 
+    private ListView mListView;
+    private ArrayAdapter<String> mListAdapter;
+
 	private ArrayList<String> mIdList = new ArrayList<String>();
 	private ArrayList<String> mTitleList = new ArrayList<String>();
 
@@ -49,15 +54,16 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 
 
-		final ListView lv = (ListView)findViewById(android.R.id.list);
+		mListView = (ListView)findViewById(android.R.id.list);
 		//lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mIdList));
-		lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mTitleList));
+        mListAdapter = new ArrayAdapter<String>(this, R.layout.list_item, mTitleList);
+        mListView.setAdapter(mListAdapter);
 
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
-				String movieTitleFromEditText = lv.getItemAtPosition(position).toString().replace(" ","+");
+				String movieTitleFromEditText = mListView.getItemAtPosition(position).toString().replace(" ","+");
 				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
 				//String value = lv.getItemAtPosition(position).toString();
@@ -106,6 +112,15 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		//b2 = (Button) findViewById(R.id.button2);
 
 		b1.setOnClickListener(this);
+        e1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    search();
+                    return true;
+                }
+                return false;
+            }
+        });
 		//b2.setOnClickListener(this);
 
 	}
@@ -126,49 +141,57 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		return movieID;
 	}
 
+    /**
+     * This is called when the user clicks the search button or presses enter in the search box
+     */
+    private void search() {
+        String movieTitleFromEditText = e1.getText().toString().replace(" ","+");
+        String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
+
+        Log.d("ucritic", "request url: " + movieQueryUrl);
+        InputStream source = retrieveStream(movieQueryUrl);
+        Gson gson = new Gson();
+        Reader reader = new InputStreamReader(source);
+        Query movieQuery = gson.fromJson(reader, Query.class);
+
+        List<Movie> movieList = movieQuery.movies;
+
+        /* list have a clear method which can optimize this kind of loop
+        for (int i = 0; i < mIdList.size();i++) { //Reset list before populating with new results
+            mIdList.remove(i);
+        }
+        */
+        mIdList.clear();
+        mTitleList.clear();
+
+        for (Movie movie : movieList) {
+            mIdList.add(movie.id);
+        }
+
+        /* I think the title is actually in the search response so this query is probably not needed */
+        for (int i = 0;i< mIdList.size();i++) {
+            //testing
+            String temp_ID = mIdList.get(i);
+            InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
+
+            Gson gson2 = new Gson();
+
+            Reader reader2 = new InputStreamReader(source2);
+
+            MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
+            //Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
+            mTitleList.add(mObject.title);
+        }
+
+        // Now that we have new data we need to refresh the list like so
+        mListAdapter.notifyDataSetChanged();
+    }
 
 	@Override
 	public void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.button:
-				String movieTitleFromEditText = e1.getText().toString().replace(" ","+");
-				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
-
-				Log.d("ucritic", "request url: " + movieQueryUrl);
-				InputStream source = retrieveStream(movieQueryUrl);
-				Gson gson = new Gson();
-				Reader reader = new InputStreamReader(source);
-				Query movieQuery = gson.fromJson(reader, Query.class);
-
-				List<Movie> movieList = movieQuery.movies;
-
-                /* list have a clear method which can optimize this kind of loop
-				for (int i = 0; i < mIdList.size();i++) { //Reset list before populating with new results
-					mIdList.remove(i);
-				}
-				*/
-                mIdList.clear();
-                mTitleList.clear();
-
-				for (Movie movie : movieList) {
-					mIdList.add(movie.id);
-				}
-
-                /* I think the title is actually in the search response so this query is probably not needed */
-				for (int i = 0;i< mIdList.size();i++) {
-					//testing
-					String temp_ID = mIdList.get(i);
-					InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
-
-					Gson gson2 = new Gson();
-
-					Reader reader2 = new InputStreamReader(source2);
-
-					MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
-					//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
-					mTitleList.add(mObject.title);
-				}
-
+                search();
 				break;
 
 //			case R.id.button2:
