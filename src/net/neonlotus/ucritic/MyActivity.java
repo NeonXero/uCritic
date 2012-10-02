@@ -37,8 +37,8 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	private EditText e1;
 	private Button b1, b2;
 
-	private ArrayList<String> idList = new ArrayList<String>();
-	private ArrayList<String> titleList = new ArrayList<String>();
+	private ArrayList<String> mIdList = new ArrayList<String>();
+	private ArrayList<String> mTitleList = new ArrayList<String>();
 
 	public String movieID;
 
@@ -50,8 +50,8 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 
 		final ListView lv = (ListView)findViewById(android.R.id.list);
-		//lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, idList));
-		lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, titleList));
+		//lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mIdList));
+		lv.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, mTitleList));
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -71,7 +71,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				Query mQuery = gson.fromJson(reader, Query.class);
 
 				List<Movie> mMovie = mQuery.movies;
-				MovieObject mObj = getMovieDataWithId(idList.get(position));
+				MovieObject mObj = getMovieDataWithId(mIdList.get(position));
 				String cs = String.valueOf(mObj.ratings.criticsScore);
 				Toast.makeText(getApplicationContext(), cs, Toast.LENGTH_SHORT).show();
 				//Toast.makeText(getApplicationContext(), String.valueOf(mMovie.size()), Toast.LENGTH_SHORT).show();
@@ -138,19 +138,26 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				InputStream source = retrieveStream(movieQueryUrl);
 				Gson gson = new Gson();
 				Reader reader = new InputStreamReader(source);
-				Query mQuery = gson.fromJson(reader, Query.class);
+				Query movieQuery = gson.fromJson(reader, Query.class);
 
-				List<Movie> mMovie = mQuery.movies;
+				List<Movie> movieList = movieQuery.movies;
 
-				for (int i = 0; i < idList.size();i++) { //Reset list before populating with new results
-					idList.remove(i);
+                /* list have a clear method which can optimize this kind of loop
+				for (int i = 0; i < mIdList.size();i++) { //Reset list before populating with new results
+					mIdList.remove(i);
 				}
-				for (Movie movie : mMovie) {
-					idList.add(movie.id);
+				*/
+                mIdList.clear();
+                mTitleList.clear();
+
+				for (Movie movie : movieList) {
+					mIdList.add(movie.id);
 				}
-				for (int i = 0;i< idList.size();i++) {
+
+                /* I think the title is actually in the search response so this query is probably not needed */
+				for (int i = 0;i< mIdList.size();i++) {
 					//testing
-					String temp_ID = idList.get(i);
+					String temp_ID = mIdList.get(i);
 					InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
 
 					Gson gson2 = new Gson();
@@ -159,7 +166,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 					MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
 					//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
-					titleList.add(mObject.title);
+					mTitleList.add(mObject.title);
 				}
 
 				break;
