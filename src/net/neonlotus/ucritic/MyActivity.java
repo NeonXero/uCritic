@@ -79,7 +79,12 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				List<Movie> mMovie = mQuery.movies;
 				MovieObject mObj = getMovieDataWithId(mIdList.get(position));
 				String cs = String.valueOf(mObj.ratings.criticsScore);
-				Toast.makeText(getApplicationContext(), cs, Toast.LENGTH_SHORT).show();
+				if (mObj.ratings.criticsScore!=-1) {
+					Toast.makeText(getApplicationContext(), "Critic score: " + cs, Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), "No critic score available.", Toast.LENGTH_SHORT).show();
+				}
+
 				//Toast.makeText(getApplicationContext(), String.valueOf(mMovie.size()), Toast.LENGTH_SHORT).show();
 
 				//MovieObject mObject = gson.fromJson(reader, MovieObject.class);
@@ -240,7 +245,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
         qparams.add(new BasicNameValuePair("apikey", ROTTEN_TOMATOES_API_KEY));
         qparams.add(new BasicNameValuePair("q", movieTitle));
-        qparams.add(new BasicNameValuePair("page_limit", "10"));
+        qparams.add(new BasicNameValuePair("page_limit", "50"));
         try {
             uri = URIUtils.createURI("http", "api.rottentomatoes.com", -1, "/api/public/v1.0/movies.json", URLEncodedUtils.format(qparams, "UTF-8"), null);
         } catch (URISyntaxException e) {

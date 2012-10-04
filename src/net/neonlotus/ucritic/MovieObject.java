@@ -13,13 +13,15 @@ public class MovieObject {
 	public String title;
 
 	@SerializedName("year")
-	public int year;
+	//public int year;
+	public String year;
 
 	@SerializedName("mpaa_rating")
 	public String mpaaRating;
 
 	@SerializedName("runtime")
-	public int runtime;
+	//public int runtime;
+	public String runtime;
 
 	@SerializedName("critics_consensus")
 	public String criticsConsensu;
