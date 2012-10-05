@@ -9,26 +9,38 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
         >
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Hello World, MyActivity"
-            android:id="@+id/text1"
-            />
+
         <EditText
             android:id="@+id/editOne"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:hint="Search movie..."
+            android:hint="Movie Title"
             android:singleLine="true"
             android:imeOptions="actionSearch"
             />
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:weightSum="1.0"
+            android:orientation="horizontal">
         <Button
             android:id="@+id/button"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:text="Get Movie ID(s)"
+            android:layout_weight=".6"
+            android:layout_gravity="center_vertical"
+            android:text="Search!"
             />
+        <ToggleButton
+                android:id="@+id/togglebutton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:layout_gravity="center_vertical"
+                android:textOn="Critic Score"
+                android:textOff="Audience Score"
+                />
+        </LinearLayout>
         <!--<Button-->
                 <!--android:id="@+id/button2"-->
                 <!--android:layout_height="wrap_content"-->
