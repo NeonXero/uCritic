@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string id="app_name" name="app_name">uCritic</string>
+    <string id="movie_hint" name="movie_hint">Movie Title</string>
+    <string id="search_button" name="search_button">Search!</string>
 </resources>

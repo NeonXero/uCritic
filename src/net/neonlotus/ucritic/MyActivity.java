@@ -22,11 +22,12 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 // http://www.javacodegeeks.com/2011/01/android-json-parsing-gson-tutorial.html
 // http://developer.rottentomatoes.com/docs/read/json/v10/Movie_Info
 // http://jsonviewer.stack.hu/#http://api.rottentomatoes.com/api/public/v1.0/movies/770672122.json?apikey=vg2cj5tgqmbkkxz2vgyxqyh9
 // Paginate the results
-// Async Task
+// Async Task [working on this]
 
 public class MyActivity extends Activity implements View.OnClickListener{
     // Constants
@@ -42,10 +43,11 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	private ArrayList<String> mIdList = new ArrayList<String>();
 	private ArrayList<String> mTitleList = new ArrayList<String>();
 
-	public String movieID;
+	// not being used currently public String movieID;
 
 	//Async
-	PerformMovieSearch performSearch = null;
+	private PerformMovieSearch performSearch = new PerformMovieSearch(this);
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,13 +66,13 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
 				//InputStream source = retrieveStream(movieQueryUrl);
-				InputStream source = performSearch.retrieveStream(movieQueryUrl);
+				//InputStream source = performSearch.retrieveStream(movieQueryUrl);
 
-				Gson gson = new Gson();
+				/*Gson gson = new Gson();
 				Reader reader = new InputStreamReader(source);
-				Query mQuery = gson.fromJson(reader, Query.class);
+				Query mQuery = gson.fromJson(reader, Query.class);*/
 
-				List<Movie> mMovie = mQuery.movies;
+				//not being used currently List<Movie> mMovie = mQuery.movies;
 				MovieObject mObj = getMovieDataWithId(mIdList.get(position));
 				String cs = String.valueOf(mObj.ratings.criticsScore);
 				if (mObj.ratings.criticsScore!=-1) {
@@ -82,8 +84,8 @@ public class MyActivity extends Activity implements View.OnClickListener{
 			}
 		});
 
-		et_TitleSearch = (EditText) findViewById(R.id.editOne);
-		b_TitleSearch = (Button) findViewById(R.id.button);
+		et_TitleSearch = (EditText) findViewById(R.id.eMovieSearch);
+		b_TitleSearch = (Button) findViewById(R.id.searchButton);
 
 		b_TitleSearch.setOnClickListener(this);
         et_TitleSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -107,16 +109,15 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		return mObject;
     }
 
-	public void setMovieID(String idFroMQuery) {
+	//Neither being used at the moment
+	/*public void setMovieID(String idFroMQuery) {
 		movieID = idFroMQuery;
-	}
-	public String getMovieID() {
+	}*/
+	/*public String getMovieID() {
 		return movieID;
-	}
+	}*/
 
-    /**
-     * This is called when the user clicks the search button or presses enter in the search box
-     */
+    /* This is called when the user clicks the search button or presses enter in the search box */
     private void search() {
         String movieTitleFromEditText = et_TitleSearch.getText().toString().replace(" ","+");
         String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
@@ -158,16 +159,15 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	@Override
 	public void onClick(View view) {
 		switch(view.getId()) {
-			case R.id.button:
-                search();
+			case R.id.searchButton:
+				search();
 				break;
 		}
 	}
 
 
-	/*
-	moving to async task class
-	private InputStream retrieveStream(String url) {
+	/*moving to async task class*/
+	/*private InputStream retrieveStream(String url) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
 
@@ -251,9 +251,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
     }
 
 
-    /**
-     * Pseudo code example of combining these two functions
-     */
+    /* Pseudo code example of combining these two functions */
     private String generateUrls(String path, List<NameValuePair> params){
         URI uri = null;
         try {

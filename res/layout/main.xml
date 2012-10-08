@@ -11,10 +11,10 @@
         >
 
         <EditText
-            android:id="@+id/editOne"
+            android:id="@+id/eMovieSearch"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:hint="Movie Title"
+            android:hint="@string/movie_hint"
             android:singleLine="true"
             android:imeOptions="actionSearch"
             />
@@ -24,21 +24,22 @@
             android:weightSum="1.0"
             android:orientation="horizontal">
         <Button
-            android:id="@+id/button"
+            android:id="@+id/searchButton"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:layout_weight=".6"
             android:layout_gravity="center_vertical"
-            android:text="Search!"
+            android:text="@string/search_button"
             />
         <ToggleButton
-                android:id="@+id/togglebutton"
+                android:id="@+id/scoreToggle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight=".4"
                 android:layout_gravity="center_vertical"
                 android:textOn="Critic Score"
                 android:textOff="Audience Score"
+                android:checked="true"
                 />
         </LinearLayout>
         <!--<Button-->

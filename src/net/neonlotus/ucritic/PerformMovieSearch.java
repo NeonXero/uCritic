@@ -15,30 +15,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ryan
- * Date: 10/4/12
- * Time: 4:58 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 
-	private Context context;
+	public Context context;
+	ProgressDialog progressDialog;
+
 
 	public PerformMovieSearch(Context context){
 		this.context = context;
 	}
-
-	private final ProgressDialog dialog = new ProgressDialog(context);
-
-	@Override
-	protected void onPreExecute() {
-		this.dialog.setMessage("Finding movies...");
-		this.dialog.show();
-	}
-
-
 
 
 	@Override
@@ -52,11 +37,10 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 				InputStream content = execute.getEntity().getContent();
 
 				BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-				String s = "";
+				String s;
 				while ((s = buffer.readLine()) != null) {
 					response += s;
 				}
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -64,15 +48,31 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 		return response;
 	}
 
+	@Override
+	protected void onPreExecute() {
+		progressDialog= ProgressDialog.show(context, "Please Wait","Searching movies", true);
+		/*this.dialog.setMessage("Finding movies...");
+		this.dialog.show();*/
+	}
+
+
+	@Override
+	protected void onPostExecute(String result) {
+		super.onPostExecute(result);
+		progressDialog.dismiss();
+
+		/*if(this.dialog.isShowing())
+			this.dialog.dismiss();*/
+
+		MyActivity.mListAdapter.notifyDataSetChanged();
+	}
 
 	public InputStream retrieveStream(String url) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
-
 		HttpGet getRequest = new HttpGet(url);
 
 		try {
-
 			HttpResponse getResponse = client.execute(getRequest);
 			final int statusCode = getResponse.getStatusLine().getStatusCode();
 
@@ -84,29 +84,19 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 
 			HttpEntity getResponseEntity = getResponse.getEntity();
 			return getResponseEntity.getContent();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			getRequest.abort();
 			Log.w(getClass().getSimpleName(), "Error for URL " + url, e);
 		}
 
 		return null;
 	}
-
-
-	@Override
-	protected void onPostExecute(String result) {
-		if(this.dialog.isShowing())
-			this.dialog.dismiss();
-
-		MyActivity.mListAdapter.notifyDataSetChanged();
-	}
 }
 
 
 
 /*
-	   direct copy of InputStream from above
+	   copy of Inputstream
 
 	   private InputStream retrieveStream(String url) {
 
