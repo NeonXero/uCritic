@@ -8,15 +8,17 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.google.gson.Gson;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -34,19 +36,20 @@ public class MyActivity extends Activity implements View.OnClickListener{
     private static final String ROTTEN_TOMATOES_API_KEY = "vg2cj5tgqmbkkxz2vgyxqyh9";
 
     // Views
-	private EditText et_TitleSearch;
+	public static EditText et_TitleSearch;
 	private Button b_TitleSearch;
 
     private ListView mListView;
     public static ArrayAdapter<String> mListAdapter; //used to be private, had to public so it could be accessed in PMS.java
 
-	private ArrayList<String> mIdList = new ArrayList<String>();
-	private ArrayList<String> mTitleList = new ArrayList<String>();
+
+	private final ArrayList<String> mIdList = new ArrayList<String>();
+	private final ArrayList<String> mTitleList = new ArrayList<String>();
 
 	// not being used currently public String movieID;
 
 	//Async
-	private PerformMovieSearch performSearch = new PerformMovieSearch(this);
+	//private PerformMovieSearch performSearch = new PerformMovieSearch(this);
 
 
 	@Override
@@ -65,7 +68,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				String movieTitleFromEditText = mListView.getItemAtPosition(position).toString().replace(" ","+");
 				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
-				//InputStream source = retrieveStream(movieQueryUrl);
+				InputStream source = retrieveStream(movieQueryUrl);
 				//InputStream source = performSearch.retrieveStream(movieQueryUrl);
 
 				/*Gson gson = new Gson();
@@ -101,7 +104,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	}
 
     private MovieObject getMovieDataWithId(String movieID) { //return movie object given an ID
-		InputStream source = performSearch.retrieveStream(generateMovieUrl(movieID));
+		InputStream source = retrieveStream(generateMovieUrl(movieID));
         Gson gson = new Gson();
         Reader reader = new InputStreamReader(source);
         MovieObject mObject = gson.fromJson(reader, MovieObject.class);
@@ -123,7 +126,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
         String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
         Log.d("ucritic", "request url: " + movieQueryUrl);
-		InputStream source = performSearch.retrieveStream(movieQueryUrl);
+		InputStream source = retrieveStream(movieQueryUrl);
         Gson gson = new Gson();
         Reader reader = new InputStreamReader(source);
         Query movieQuery = gson.fromJson(reader, Query.class);
@@ -138,19 +141,18 @@ public class MyActivity extends Activity implements View.OnClickListener{
         }
 
         /* I think the title is actually in the search response so this query is probably not needed */
-        for (int i = 0;i< mIdList.size();i++) {
-            //testing
-            String temp_ID = mIdList.get(i);
-            InputStream source2 = performSearch.retrieveStream(generateMovieUrl(temp_ID));
+		for (String temp_ID : mIdList) {
+			//testing
+			InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
 
-            Gson gson2 = new Gson();
+			Gson gson2 = new Gson();
 
-            Reader reader2 = new InputStreamReader(source2);
+			Reader reader2 = new InputStreamReader(source2);
 
-            MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
-            //Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
-            mTitleList.add(mObject.title);
-        }
+			MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
+			//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
+			mTitleList.add(mObject.title);
+		}
 
         // Now that we have new data we need to refresh the list like so
         mListAdapter.notifyDataSetChanged();
@@ -160,14 +162,17 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	public void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.searchButton:
-				search();
+				//search();
+				new PerformMovieSearch(this).execute("http://example.com/image.png");
+
 				break;
+
 		}
 	}
 
 
 	/*moving to async task class*/
-	/*private InputStream retrieveStream(String url) {
+	private InputStream retrieveStream(String url) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
 
@@ -193,12 +198,10 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		}
 
 		return null;
-	}*/
+	}
 
     /**
      * Generates a movie search(query) url based on input movie title (query)
-     * @param movieTitle - movie title
-     * @return
      */
     private String generateMovieQueryUrl(String movieTitle) {
         URI uri = null;
@@ -251,16 +254,18 @@ public class MyActivity extends Activity implements View.OnClickListener{
     }
 
 
-    /* Pseudo code example of combining these two functions */
-    private String generateUrls(String path, List<NameValuePair> params){
-        URI uri = null;
-        try {
-            uri = URIUtils.createURI("http", "api.rottentomatoes.com", -1, path, URLEncodedUtils.format(params, "UTF-8"), null);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return (uri != null) ? uri.toString() : null;
-    }
+// --Commented out by Inspection START (10/11/12 1:07 PM):
+//    /* Pseudo code example of combining these two functions */
+//    private String generateUrls(String path, List<NameValuePair> params){
+//        URI uri = null;
+//        try {
+//            uri = URIUtils.createURI("http", "api.rottentomatoes.com", -1, path, URLEncodedUtils.format(params, "UTF-8"), null);
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return (uri != null) ? uri.toString() : null;
+//    }
+// --Commented out by Inspection STOP (10/11/12 1:07 PM)
 
 }

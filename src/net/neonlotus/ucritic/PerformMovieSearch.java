@@ -10,15 +10,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 
-	public Context context;
-	ProgressDialog progressDialog;
+	private final Context context;
+	private ProgressDialog progressDialog;
 
 
 	public PerformMovieSearch(Context context){
@@ -28,7 +26,13 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 
 	@Override
 	protected String doInBackground(String... urls) {
-		String response = "";
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		return urls[0];
+		/*String response = "";
 		for (String url : urls) {
 			DefaultHttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(url);
@@ -45,14 +49,13 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 				e.printStackTrace();
 			}
 		}
-		return response;
+		return response;*/
 	}
 
 	@Override
 	protected void onPreExecute() {
 		progressDialog= ProgressDialog.show(context, "Please Wait","Searching movies", true);
-		/*this.dialog.setMessage("Finding movies...");
-		this.dialog.show();*/
+
 	}
 
 
@@ -61,9 +64,9 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 		super.onPostExecute(result);
 		progressDialog.dismiss();
 
-		/*if(this.dialog.isShowing())
-			this.dialog.dismiss();*/
+		
 
+		MyActivity.et_TitleSearch.setHint("zoop");
 		MyActivity.mListAdapter.notifyDataSetChanged();
 	}
 

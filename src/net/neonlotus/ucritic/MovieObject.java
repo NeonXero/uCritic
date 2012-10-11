@@ -2,7 +2,7 @@ package net.neonlotus.ucritic;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MovieObject {
+class MovieObject {
 
 	public Rating ratings; //You are a problem
 
