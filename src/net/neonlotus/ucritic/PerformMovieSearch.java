@@ -9,11 +9,17 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 
-public class PerformMovieSearch extends AsyncTask<String, Void, String> {
+public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>> {
+	//class PerformMovieSearch AsyncTask<String, Void, ArrayList<Movie>>() {
+	//class PerformMovieSearch AsyncTask<String, Void, String> {
+
 
 	private final Context context;
 	private ProgressDialog progressDialog;
@@ -23,16 +29,30 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 		this.context = context;
 	}
 
-
 	@Override
-	protected String doInBackground(String... urls) {
+	protected ArrayList<Movie> doInBackground(String... params) {
+
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
+			String moviesJsonString = retrieveStream(params[0]);
+			JSONObject moviesJson = new JSONObject(moviesJsonString);
+		} catch (JSONException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
-		return urls[0];
-		/*String response = "";
+
+		ArrayList<Movie> movies = new ArrayList<Movie>();
+		/*
+						 * Do your code to process the JSON and create an ArrayList of films.
+						 * It's just a suggestion how to store the data.
+						 */
+		return movies;
+	}
+
+	/*@Override
+	protected String doInBackground(String... urls) {
+		retrieveStream(urls[0]);
+		//return urls[0];
+		return null;
+		*//*String response = "";
 		for (String url : urls) {
 			DefaultHttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(url);
@@ -49,8 +69,8 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 				e.printStackTrace();
 			}
 		}
-		return response;*/
-	}
+		return response;*//*
+	}*/
 
 	@Override
 	protected void onPreExecute() {
@@ -59,18 +79,22 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 	}
 
 
-	@Override
+	/*@Override
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
 		progressDialog.dismiss();
 
-		
-
-		MyActivity.et_TitleSearch.setHint("zoop");
+		MyActivity.mListAdapter.notifyDataSetChanged();
+	}*/
+	protected void onPostExecute(ArrayList<Movie> result) {
+		progressDialog.dismiss();
+		//create a method to set an ArrayList in your adapter and set it here.
+		MyActivity.mListAdapter.setMovies(result);
 		MyActivity.mListAdapter.notifyDataSetChanged();
 	}
 
-	public InputStream retrieveStream(String url) {
+
+	public String retrieveStream(String url) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
 		HttpGet getRequest = new HttpGet(url);
@@ -86,7 +110,8 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 			}
 
 			HttpEntity getResponseEntity = getResponse.getEntity();
-			return getResponseEntity.getContent();
+			String jsonString = EntityUtils.toString(getResponseEntity);
+			return jsonString;
 		} catch (IOException e) {
 			getRequest.abort();
 			Log.w(getClass().getSimpleName(), "Error for URL " + url, e);
@@ -94,6 +119,9 @@ public class PerformMovieSearch extends AsyncTask<String, Void, String> {
 
 		return null;
 	}
+
+
+
 }
 
 

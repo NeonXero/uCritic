@@ -8,17 +8,12 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -42,14 +37,16 @@ public class MyActivity extends Activity implements View.OnClickListener{
     private ListView mListView;
     public static ArrayAdapter<String> mListAdapter; //used to be private, had to public so it could be accessed in PMS.java
 
-
 	private final ArrayList<String> mIdList = new ArrayList<String>();
 	private final ArrayList<String> mTitleList = new ArrayList<String>();
+
+	public static String movieQueryUrl;// = generateMovieQueryUrl(movieTitleFromEditText);
+	String movieTitleFromEditText;// = mListView.getItemAtPosition(position).toString().replace(" ","+");
 
 	// not being used currently public String movieID;
 
 	//Async
-	//private PerformMovieSearch performSearch = new PerformMovieSearch(this);
+	private PerformMovieSearch performSearch = new PerformMovieSearch(this);
 
 
 	@Override
@@ -65,11 +62,11 @@ public class MyActivity extends Activity implements View.OnClickListener{
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
-				String movieTitleFromEditText = mListView.getItemAtPosition(position).toString().replace(" ","+");
-				String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
+				movieTitleFromEditText = mListView.getItemAtPosition(position).toString().replace(" ","+");
+				movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
-				InputStream source = retrieveStream(movieQueryUrl);
 				//InputStream source = performSearch.retrieveStream(movieQueryUrl);
+				//InputStream source = retrieveStream(movieQueryUrl);
 
 				/*Gson gson = new Gson();
 				Reader reader = new InputStreamReader(source);
@@ -104,12 +101,13 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	}
 
     private MovieObject getMovieDataWithId(String movieID) { //return movie object given an ID
-		InputStream source = retrieveStream(generateMovieUrl(movieID));
+		// async InputStream source = performSearch.retrieveStream(generateMovieUrl(movieID));
         Gson gson = new Gson();
-        Reader reader = new InputStreamReader(source);
-        MovieObject mObject = gson.fromJson(reader, MovieObject.class);
+		// async Reader reader = new InputStreamReader(source);
+		// async MovieObject mObject = gson.fromJson(reader, MovieObject.class);
 
-		return mObject;
+		// async return mObject;
+		return null;
     }
 
 	//Neither being used at the moment
@@ -122,36 +120,39 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
     /* This is called when the user clicks the search button or presses enter in the search box */
     private void search() {
+		new PerformMovieSearch(this).execute(movieQueryUrl);
         String movieTitleFromEditText = et_TitleSearch.getText().toString().replace(" ","+");
         String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
 
         Log.d("ucritic", "request url: " + movieQueryUrl);
-		InputStream source = retrieveStream(movieQueryUrl);
+		// async InputStream source = performSearch.retrieveStream(movieQueryUrl);
         Gson gson = new Gson();
-        Reader reader = new InputStreamReader(source);
-        Query movieQuery = gson.fromJson(reader, Query.class);
+		// async Reader reader = new InputStreamReader(source);
+		// async Query movieQuery = gson.fromJson(reader, Query.class);
 
-        List<Movie> movieList = movieQuery.movies;
+		// async List<Movie> movieList = movieQuery.movies;
 
         mIdList.clear();
         mTitleList.clear();
 
-        for (Movie movie : movieList) {
+		// async
+		/*for (Movie movie : movieList) {
             mIdList.add(movie.id);
-        }
+        }*/
 
         /* I think the title is actually in the search response so this query is probably not needed */
 		for (String temp_ID : mIdList) {
 			//testing
-			InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
+			//InputStream source2 = retrieveStream(generateMovieUrl(temp_ID));
+			// async InputStream source2 = performSearch.retrieveStream(generateMovieQueryUrl(temp_ID));
 
 			Gson gson2 = new Gson();
 
-			Reader reader2 = new InputStreamReader(source2);
+			// async Reader reader2 = new InputStreamReader(source2);
 
-			MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
+			// async MovieObject mObject = gson2.fromJson(reader2, MovieObject.class);
 			//Toast.makeText(getBaseContext(), mObject.title, Toast.LENGTH_SHORT).show();
-			mTitleList.add(mObject.title);
+			// async mTitleList.add(mObject.title);
 		}
 
         // Now that we have new data we need to refresh the list like so
@@ -162,8 +163,8 @@ public class MyActivity extends Activity implements View.OnClickListener{
 	public void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.searchButton:
-				//search();
-				new PerformMovieSearch(this).execute("http://example.com/image.png");
+				search();
+
 
 				break;
 
@@ -172,7 +173,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
 
 	/*moving to async task class*/
-	private InputStream retrieveStream(String url) {
+	/*private InputStream retrieveStream(String url) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
 
@@ -198,7 +199,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
 		}
 
 		return null;
-	}
+	}*/
 
     /**
      * Generates a movie search(query) url based on input movie title (query)
