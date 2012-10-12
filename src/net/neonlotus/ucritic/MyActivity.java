@@ -120,9 +120,10 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
     /* This is called when the user clicks the search button or presses enter in the search box */
     private void search() {
-		new PerformMovieSearch(this).execute(movieQueryUrl);
+
         String movieTitleFromEditText = et_TitleSearch.getText().toString().replace(" ","+");
         String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
+		new PerformMovieSearch(this).execute(movieQueryUrl);
 
         Log.d("ucritic", "request url: " + movieQueryUrl);
 		// async InputStream source = performSearch.retrieveStream(movieQueryUrl);
@@ -204,7 +205,7 @@ public class MyActivity extends Activity implements View.OnClickListener{
     /**
      * Generates a movie search(query) url based on input movie title (query)
      */
-    private String generateMovieQueryUrl(String movieTitle) {
+	public static String generateMovieQueryUrl(String movieTitle) {
         URI uri = null;
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
         qparams.add(new BasicNameValuePair("apikey", ROTTEN_TOMATOES_API_KEY));

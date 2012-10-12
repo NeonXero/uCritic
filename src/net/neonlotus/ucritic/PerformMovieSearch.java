@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -13,8 +15,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>> {
 	//class PerformMovieSearch AsyncTask<String, Void, ArrayList<Movie>>() {
@@ -46,31 +49,6 @@ public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>
 						 */
 		return movies;
 	}
-
-	/*@Override
-	protected String doInBackground(String... urls) {
-		retrieveStream(urls[0]);
-		//return urls[0];
-		return null;
-		*//*String response = "";
-		for (String url : urls) {
-			DefaultHttpClient client = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(url);
-			try {
-				HttpResponse execute = client.execute(httpGet);
-				InputStream content = execute.getEntity().getContent();
-
-				BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-				String s;
-				while ((s = buffer.readLine()) != null) {
-					response += s;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return response;*//*
-	}*/
 
 	@Override
 	protected void onPreExecute() {
@@ -120,39 +98,34 @@ public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>
 		return null;
 	}
 
+	public void setMovies(ArrayList<Movie> movieList) throws Exception {
+		String movieTitleFromEditText = "Toy Story";
+		String movieQueryUrl = MyActivity.generateMovieQueryUrl(movieTitleFromEditText);
 
+		InputStream source = null;// = retrieveStream(movieQueryUrl);
 
+		String convertedIS = convertStreamToString(source);
+		String mqu = retrieveStream(convertedIS);
+
+		Gson gson = new Gson();
+		Reader reader = new InputStreamReader(source);
+		Query movieQuery = gson.fromJson(reader, Query.class);
+		List<Movie> movieListTwo = movieQuery.movies;
+
+		movieList.add(movieListTwo.get(0));
+	}
+
+	public static String convertStreamToString(InputStream is) throws Exception {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
+
+		is.close();
+
+		return sb.toString();
+	}
 }
-
-
-
-/*
-	   copy of Inputstream
-
-	   private InputStream retrieveStream(String url) {
-
-		   DefaultHttpClient client = new DefaultHttpClient();
-
-		   HttpGet getRequest = new HttpGet(url);
-
-		   try {
-
-			   HttpResponse getResponse = client.execute(getRequest);
-			   final int statusCode = getResponse.getStatusLine().getStatusCode();
-
-			   if (statusCode != HttpStatus.SC_OK) {
-				   Log.w(getClass().getSimpleName(),
-						   "Error " + statusCode + " for URL " + url);
-				   return null;
-			   }
-
-			   HttpEntity getResponseEntity = getResponse.getEntity();
-			   return getResponseEntity.getContent();
-		   }
-		   catch (IOException e) {
-			   getRequest.abort();
-			   Log.w(getClass().getSimpleName(), "Error for URL " + url, e);
-		   }
-
-		   return null;
-	   }*/
