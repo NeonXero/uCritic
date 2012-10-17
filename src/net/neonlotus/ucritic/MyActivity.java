@@ -25,6 +25,8 @@ import java.util.List;
 // http://jsonviewer.stack.hu/#http://api.rottentomatoes.com/api/public/v1.0/movies/770672122.json?apikey=vg2cj5tgqmbkkxz2vgyxqyh9
 // Paginate the results
 // Async Task [working on this]
+// Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+
 
 public class MyActivity extends Activity implements View.OnClickListener{
     // Constants

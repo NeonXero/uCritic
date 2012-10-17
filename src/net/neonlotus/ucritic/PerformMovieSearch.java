@@ -39,6 +39,7 @@ public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>
 			String moviesJsonString = retrieveStream(params[0]);
 			JSONObject moviesJson = new JSONObject(moviesJsonString);
 		} catch (JSONException e) {
+			Log.d("ucritic", "doinbackground broke");
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 
@@ -67,10 +68,49 @@ public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>
 	protected void onPostExecute(ArrayList<Movie> result) {
 		progressDialog.dismiss();
 		//create a method to set an ArrayList in your adapter and set it here.
-		MyActivity.mListAdapter.setMovies(result);
-		MyActivity.mListAdapter.notifyDataSetChanged();
+		//MyActivity.mListAdapter.setMovies(result);
+		try {
+			setMovies(MyActivity.mListAdapter,result);
+			MyActivity.mListAdapter.notifyDataSetChanged();
+		} catch (Exception e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
 	}
 
+
+
+
+	public void setMovies(ArrayAdapter<String> movieAdapter, ArrayList<Movie> movieList) throws Exception {
+		String movieTitleFromEditText = "Toy Story";
+		String movieQueryUrl = MyActivity.generateMovieQueryUrl(movieTitleFromEditText);
+
+		InputStream source = null;// = retrieveStream(movieQueryUrl);
+
+		String convertedIS = convertStreamToString(source);
+		String mqu = retrieveStream(convertedIS);
+
+		Gson gson = new Gson();
+		Reader reader = new InputStreamReader(source); //this is null, so not doing anything. Have to assign...
+		Query movieQuery = gson.fromJson(reader, Query.class);
+		List<Movie> movieListTwo = movieQuery.movies;
+
+		movieList.add(movieListTwo.get(0));
+	}
+
+	public static String convertStreamToString(InputStream is) throws Exception {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
+
+		is.close();
+
+		return sb.toString();
+	}
 
 	public String retrieveStream(String url) {
 
@@ -96,36 +136,5 @@ public class PerformMovieSearch extends AsyncTask<String, Void, ArrayList<Movie>
 		}
 
 		return null;
-	}
-
-	public void setMovies(ArrayList<Movie> movieList) throws Exception {
-		String movieTitleFromEditText = "Toy Story";
-		String movieQueryUrl = MyActivity.generateMovieQueryUrl(movieTitleFromEditText);
-
-		InputStream source = null;// = retrieveStream(movieQueryUrl);
-
-		String convertedIS = convertStreamToString(source);
-		String mqu = retrieveStream(convertedIS);
-
-		Gson gson = new Gson();
-		Reader reader = new InputStreamReader(source);
-		Query movieQuery = gson.fromJson(reader, Query.class);
-		List<Movie> movieListTwo = movieQuery.movies;
-
-		movieList.add(movieListTwo.get(0));
-	}
-
-	public static String convertStreamToString(InputStream is) throws Exception {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-		String line = null;
-
-		while ((line = reader.readLine()) != null) {
-			sb.append(line);
-		}
-
-		is.close();
-
-		return sb.toString();
 	}
 }
