@@ -13,10 +13,11 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +126,9 @@ public class MyActivity extends Activity implements View.OnClickListener{
 
         String movieTitleFromEditText = et_TitleSearch.getText().toString().replace(" ","+");
         String movieQueryUrl = generateMovieQueryUrl(movieTitleFromEditText);
-		new PerformMovieSearch(this).execute(movieQueryUrl);
+		//trying to do this down further new PerformMovieSearch(this).execute(movieQueryUrl);
+		String lizlemon = ""; //nevermind
+		//mListAdapter.notifyDataSetChanged(); //test 10.24
 
         Log.d("ucritic", "request url: " + movieQueryUrl);
 		// async InputStream source = performSearch.retrieveStream(movieQueryUrl);
@@ -158,6 +161,8 @@ public class MyActivity extends Activity implements View.OnClickListener{
 			// async mTitleList.add(mObject.title);
 		}
 
+
+		new PerformMovieSearch(this).execute(movieQueryUrl);
         // Now that we have new data we need to refresh the list like so
         mListAdapter.notifyDataSetChanged();
     }
@@ -172,6 +177,22 @@ public class MyActivity extends Activity implements View.OnClickListener{
 				break;
 
 		}
+	}
+
+	public static void setMovies(ArrayList<Movie> movieList) throws Exception {
+		String movieTitleFromEditText = et_TitleSearch.getText().toString().replace(" ","+");
+		String movieQueryUrl = MyActivity.generateMovieQueryUrl(movieTitleFromEditText);
+
+		InputStream source = new ByteArrayInputStream( PerformMovieSearch.retrieveStream(movieQueryUrl).getBytes(Charset
+				.defaultCharset()) );
+
+		Gson gson = new Gson();
+		Reader reader = new InputStreamReader(source); //this is null, so not doing anything. Have to assign...
+		Query movieQuery = gson.fromJson(reader, Query.class);
+		List<Movie> movieListTwo = movieQuery.movies;
+
+		movieList.add(movieListTwo.get(0));
+		mListAdapter.notifyDataSetChanged();
 	}
 
 
